@@ -3,13 +3,13 @@
         <div class="row align-items-center">
             <div class="col-md-4">
                 <a href="/" class="text-white text-decoration-none">
-                    <h1 class="h3 mb-0">Кожевенная артель "Ветеран"</h1>
+                    <h1 class="h3 mb-0">Кожевенная артель «Ветеран»</h1>
                     <small>Изделия из кожи ручной работы</small>
                 </a>
             </div>
             <div class="col-md-4">
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Поиск товаров..." aria-label="Search">
+                <form class="d-flex" role="search" method="get" action="/catalog/">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Поиск товаров..." aria-label="Search" value="{{ query }}">
                     <button class="btn btn-outline-light" type="submit">Найти</button>
                 </form>
             </div>

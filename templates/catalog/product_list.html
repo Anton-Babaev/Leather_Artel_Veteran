@@ -2,15 +2,15 @@
 {% load static %}
 
 {% block title %}
-    {% if category %}{{ category.name }}{% else %}Каталог товаров{% endif %} - GINZO
+    {% if category %}{{ category.name }}{% else %}Каталог товаров{% endif %} - Кожевенная артель «Ветеран»
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-        <!-- Sidebar с категориями -->
+        <!-- Sidebar с фильтрами -->
         <div class="col-md-3">
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-header bg-dark text-white">
                     <h5 class="mb-0">Категории</h5>
                 </div>
@@ -31,24 +31,88 @@
                     </ul>
                 </div>
             </div>
+            
+            <!-- Форма фильтров -->
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Фильтры</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get">
+                        <!-- Поиск -->
+                        <div class="mb-3">
+                            <label class="form-label">Поиск</label>
+                            <input type="text" name="q" class="form-control" placeholder="Название..." value="{{ query }}">
+                        </div>
+                        
+                        <!-- Цена -->
+                        <div class="mb-3">
+                            <label class="form-label">Цена</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="number" name="min_price" class="form-control" placeholder="от" value="{{ min_price }}">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" name="max_price" class="form-control" placeholder="до" value="{{ max_price }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Дополнительные фильтры -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="in_stock" class="form-check-input" id="inStock" {% if in_stock %}checked{% endif %}>
+                                <label class="form-check-label" for="inStock">Только в наличии</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="is_new" class="form-check-input" id="isNew" {% if is_new %}checked{% endif %}>
+                                <label class="form-check-label" for="isNew">Новинки</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="is_bestseller" class="form-check-input" id="isBestseller" {% if is_bestseller %}checked{% endif %}>
+                                <label class="form-check-label" for="isBestseller">Хиты продаж</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Сортировка -->
+                        <div class="mb-3">
+                            <label class="form-label">Сортировка</label>
+                            <select name="sort" class="form-select">
+                                <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Сначала новинки</option>
+                                <option value="price" {% if sort_by == 'price' %}selected{% endif %}>По возрастанию цены</option>
+                                <option value="-price" {% if sort_by == '-price' %}selected{% endif %}>По убыванию цены</option>
+                                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>По названию (А-Я)</option>
+                                <option value="-name" {% if sort_by == '-name' %}selected{% endif %}>По названию (Я-А)</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-dark w-100">Применить</button>
+                        <a href="{% url 'catalog:product_list' %}" class="btn btn-outline-secondary w-100 mt-2">Сбросить</a>
+                    </form>
+                </div>
+            </div>
         </div>
         
         <!-- Товары -->
         <div class="col-md-9">
             <h1 class="mb-4">{% if category %}{{ category.name }}{% else %}Все товары{% endif %}</h1>
             
+            {% if query %}
+                <p class="text-muted">Результаты поиска: "{{ query }}"</p>
+            {% endif %}
+            
             <div class="row">
                 {% for product in products %}
                     <div class="col-md-4 mb-4">
                         <div class="card product-card h-100">
                             {% if product.image %}
-                                <a href="{% url 'catalog:product_detail' product.id product.slug %}">
+                                <a href="{{ product.get_absolute_url }}">
                                     <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
                                 </a>
                             {% endif %}
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <a href="{% url 'catalog:product_detail' product.id product.slug %}" class="text-decoration-none text-dark">
+                                    <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark">
                                         {{ product.name }}
                                     </a>
                                 </h5>
@@ -59,11 +123,20 @@
                                     {% endif %}
                                     <span class="fs-5 fw-bold text-dark">{{ product.price }} ₽</span>
                                 </div>
+                                {% if product.stock <= 0 %}
+                                    <span class="badge bg-danger mt-2">Нет в наличии</span>
+                                {% endif %}
                             </div>
                             <div class="card-footer bg-transparent border-0">
-                                <button class="btn btn-dark btn-sm w-100 add-to-cart" data-product-id="{{ product.id }}">
-                                    <i class="bi bi-cart-plus"></i> В корзину
-                                </button>
+                                {% if product.is_available and product.stock > 0 %}
+                                    <button class="btn btn-dark btn-sm w-100 add-to-cart" data-product-id="{{ product.id }}">
+                                        <i class="bi bi-cart-plus"></i> В корзину
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm w-100" disabled>
+                                        <i class="bi bi-cart-plus"></i> Нет в наличии
+                                    </button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -75,6 +148,47 @@
                     </div>
                 {% endfor %}
             </div>
+            
+            <!-- Пагинация -->
+            {% if paginator.num_pages > 1 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if products.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&laquo;</span>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in products.paginator.page_range %}
+                        {% if products.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if products.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&raquo;</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
         </div>
     </div>
 </div>

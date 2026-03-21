@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Кожевенная артель «Ветеран»{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'catalog:product_list' %}">Каталог</a></li>
+            <li class="breadcrumb-item"><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <!-- Галерея изображений -->
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}" id="mainImage">
+                    {% endif %}
+                </div>
+                {% if product.images.all %}
+                    <div class="col-12">
+                        <div class="row">
+                            {% for img in product.images.all %}
+                                <div class="col-3">
+                                    <img src="{{ img.image.url }}" class="img-fluid rounded cursor-pointer" style="cursor: pointer;" onclick="document.getElementById('mainImage').src = this.src">
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Информация о товаре -->
+        <div class="col-md-6">
+            <h1>{{ product.name }}</h1>
+            <p class="text-muted">{{ product.category.name }}</p>
+            
+            <!-- Цена -->
+            <div class="mt-4">
+                {% if product.old_price %}
+                    <span class="text-decoration-line-through text-muted fs-5">{{ product.old_price }} ₽</span>
+                {% endif %}
+                <span class="fs-2 fw-bold text-dark">{{ product.price }} ₽</span>
+            </div>
+            
+            <!-- Краткое описание -->
+            {% if product.short_description %}
+                <div class="mt-3">
+                    <p class="lead">{{ product.short_description }}</p>
+                </div>
+            {% endif %}
+            
+            <!-- Полное описание -->
+            <div class="mt-4">
+                <h5>Описание:</h5>
+                <p>{{ product.description|linebreaks }}</p>
+            </div>
+            
+            <!-- Характеристики -->
+            {% if product.material or product.dimensions or product.color or product.weight %}
+                <div class="mt-4">
+                    <h5>Характеристики:</h5>
+                    <table class="table table-sm">
+                        {% if product.material %}
+                            <tr>
+                                <th>Материал:</th>
+                                <td>{{ product.material }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if product.dimensions %}
+                            <tr>
+                                <th>Размеры:</th>
+                                <td>{{ product.dimensions }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if product.weight %}
+                            <tr>
+                                <th>Вес:</th>
+                                <td>{{ product.weight }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if product.color %}
+                            <tr>
+                                <th>Цвет:</th>
+                                <td>{{ product.color }}</td>
+                            </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            {% endif %}
+            
+            <!-- Наличие -->
+            <div class="mt-3">
+                {% if product.is_available and product.stock > 0 %}
+                    <span class="badge bg-success">В наличии ({{ product.stock }} шт.)</span>
+                {% else %}
+                    <span class="badge bg-danger">Нет в наличии</span>
+                {% endif %}
+            </div>
+            
+            <!-- Кнопка добавления в корзину -->
+            {% if product.is_available and product.stock > 0 %}
+                <div class="mt-4">
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <input type="number" class="form-control" id="quantity" value="1" min="1" max="{{ product.stock }}">
+                        </div>
+                        <div class="col-8">
+                            <button class="btn btn-dark btn-lg w-100 add-to-cart" data-product-id="{{ product.id }}">
+                                <i class="bi bi-cart-plus"></i> В корзину
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Функция для добавления в корзину (пока заглушка)
+document.querySelectorAll('.add-to-cart').forEach(button => {
+    button.addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        const quantity = document.getElementById('quantity')?.value || 1;
+        alert(`Товар добавлен в корзину!\nID: ${productId}\nКоличество: ${quantity}`);
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
