@@ -141,15 +141,27 @@ function updateCartCounter(totalItems) {
     }
 }
 
-function updateCartTotal(total, totalItems) {
-    const totalElement = document.getElementById('cart-total-price');
-    const itemsElement = document.getElementById('cart-total-items');
-    if (totalElement) totalElement.textContent = total + ' ₽';
-    if (itemsElement) itemsElement.textContent = totalItems;
-    
-    if (totalItems === 0) {
-        location.reload();
-    }
+function updateCartTotals() {
+    // Обновляем общую сумму и количество товаров
+    fetch('/cart/', {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        // Извлекаем общую сумму и количество из HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const totalPrice = doc.querySelector('#cart-total-price')?.textContent;
+        const totalItems = doc.querySelector('#cart-total-items')?.textContent;
+        
+        if (totalPrice) document.getElementById('cart-total-price').textContent = totalPrice;
+        if (totalItems) document.getElementById('cart-total-items').textContent = totalItems;
+        
+        updateCartCounter(totalItems);
+    });
 }
 
 function updateCart(productId, action, quantity = null) {
@@ -178,17 +190,34 @@ function updateCart(productId, action, quantity = null) {
             updateCartCounter(data.cart_total_items);
             
             if (action === 'remove') {
-                document.getElementById(`cart-item-${productId}`)?.remove();
-                updateCartTotal(data.cart_total, data.cart_total_items);
+                const row = document.getElementById(`cart-item-${productId}`);
+                if (row) row.remove();
+                updateCartTotals();
             } else if (action === 'update') {
-                document.querySelector(`.item-total[data-product-id="${productId}"]`).textContent = data.item_total + ' ₽';
-                updateCartTotal(data.cart_total, data.cart_total_items);
+                // Обновляем сумму строки
+                const itemTotal = document.querySelector(`.item-total[data-product-id="${productId}"]`);
+                if (itemTotal) itemTotal.textContent = data.item_total + ' ₽';
+                // Обновляем общую сумму
+                const totalElement = document.getElementById('cart-total-price');
+                if (totalElement) totalElement.textContent = data.cart_total + ' ₽';
+                const itemsElement = document.getElementById('cart-total-items');
+                if (itemsElement) itemsElement.textContent = data.cart_total_items;
+                updateCartCounter(data.cart_total_items);
+            }
+            
+            // Если корзина пуста, перезагружаем страницу
+            if (data.cart_total_items === 0) {
+                location.reload();
             }
         }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
     });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Удаление товара
     document.querySelectorAll('.remove-from-cart').forEach(button => {
         button.addEventListener('click', function() {
             const productId = this.dataset.productId;
@@ -196,6 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Обновление количества
     document.querySelectorAll('.update-cart').forEach(button => {
         button.addEventListener('click', function() {
             const productId = this.dataset.productId;

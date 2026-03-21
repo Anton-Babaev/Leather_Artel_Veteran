@@ -44,16 +44,22 @@ def cart_remove(request, product_id):
 def cart_update(request, product_id):
     cart = Cart(request)
     quantity = int(request.POST.get('quantity', 1))
+    
     cart.update_quantity(product_id, quantity)
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        # Ищем сумму для этого товара
+        item_total = "0"
         for item in cart:
             if str(item['product'].id) == str(product_id):
-                return JsonResponse({
-                    'success': True,
-                    'item_total': str(item['total_price']),
-                    'cart_total': str(cart.get_total_price()),
-                    'cart_total_items': len(cart)
-                })
+                item_total = str(item['total_price'])
+                break
+        
+        return JsonResponse({
+            'success': True,
+            'item_total': item_total,
+            'cart_total': str(cart.get_total_price()),
+            'cart_total_items': len(cart)
+        })
     
     return redirect('cart:detail')
