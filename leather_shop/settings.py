@@ -50,7 +50,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # 'catalog.context_processors.categories',  # Закомментировано до создания моделей
+                'catalog.context_processors.categories',
+                'cart.context_processors.cart',
             ],
         },
     },
@@ -106,3 +107,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Настройки сессий (для корзины)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_AGE = 1209600  # 2 недели
+
+# Корзина
+CART_SESSION_ID = 'cart'

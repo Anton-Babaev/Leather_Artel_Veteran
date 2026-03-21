@@ -8,15 +8,15 @@
                 </a>
             </div>
             <div class="col-md-4">
-                <form class="d-flex" role="search" method="get" action="/catalog/">
+                <form class="d-flex" role="search" method="get" action="{% url 'catalog:product_list' %}">
                     <input class="form-control me-2" type="search" name="q" placeholder="Поиск товаров..." aria-label="Search" value="{{ query }}">
                     <button class="btn btn-outline-light" type="submit">Найти</button>
                 </form>
             </div>
             <div class="col-md-4 text-end">
-                <a href="/cart/" class="text-white text-decoration-none me-3">
-                    <i class="bi bi-cart"></i> Корзина 
-                    <span class="badge bg-light text-dark">0</span>
+                <a href="{% url 'cart:detail' %}" class="text-white text-decoration-none me-3">
+                    <i class="bi bi-cart"></i> Корзина
+                    <span id="cart-counter" class="badge bg-danger rounded-pill">{{ cart|length }}</span>
                 </a>
                 <a href="/profile/" class="text-white text-decoration-none">
                     <i class="bi bi-person"></i> Войти
