@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if category %}{{ category.name }}{% else %}Каталог товаров{% endif %} - GINZO
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar с категориями -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Категории</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'catalog:product_list' %}" class="text-decoration-none {% if not category %}fw-bold text-dark{% endif %}">
+                                Все товары
+                            </a>
+                        </li>
+                        {% for cat in categories %}
+                            <li class="mb-2">
+                                <a href="{% url 'catalog:product_list_by_category' cat.slug %}" class="text-decoration-none {% if category.slug == cat.slug %}fw-bold text-dark{% endif %}">
+                                    {{ cat.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Товары -->
+        <div class="col-md-9">
+            <h1 class="mb-4">{% if category %}{{ category.name }}{% else %}Все товары{% endif %}</h1>
+            
+            <div class="row">
+                {% for product in products %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card product-card h-100">
+                            {% if product.image %}
+                                <a href="{% url 'catalog:product_detail' product.id product.slug %}">
+                                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
+                                </a>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{% url 'catalog:product_detail' product.id product.slug %}" class="text-decoration-none text-dark">
+                                        {{ product.name }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted small">{{ product.short_description|truncatechars:60 }}</p>
+                                <div class="mt-3">
+                                    {% if product.old_price %}
+                                        <span class="text-decoration-line-through text-muted">{{ product.old_price }} ₽</span>
+                                    {% endif %}
+                                    <span class="fs-5 fw-bold text-dark">{{ product.price }} ₽</span>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0">
+                                <button class="btn btn-dark btn-sm w-100 add-to-cart" data-product-id="{{ product.id }}">
+                                    <i class="bi bi-cart-plus"></i> В корзину
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            Товары не найдены.
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
