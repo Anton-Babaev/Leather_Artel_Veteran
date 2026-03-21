@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная - GINZO{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Hero Section -->
+    <div class="p-5 mb-4 bg-light rounded-3 text-center">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">Изделия из кожи ручной работы</h1>
+            <p class="col-md-8 fs-4 mx-auto">Уникальные аксессуары, созданные с душой. Качество, которое чувствуется.</p>
+            <a href="/catalog/" class="btn btn-dark btn-lg">Перейти в каталог</a>
+        </div>
+    </div>
+    
+    <!-- Преимущества -->
+    <div class="row text-center mb-5">
+        <div class="col-md-3 mb-3">
+            <i class="bi bi-gem fs-1"></i>
+            <h5 class="mt-2">Ручная работа</h5>
+            <p class="text-muted">Каждое изделие создается вручную</p>
+        </div>
+        <div class="col-md-3 mb-3">
+            <i class="bi bi-star fs-1"></i>
+            <h5 class="mt-2">Натуральная кожа</h5>
+            <p class="text-muted">Только высококачественные материалы</p>
+        </div>
+        <div class="col-md-3 mb-3">
+            <i class="bi bi-truck fs-1"></i>
+            <h5 class="mt-2">Быстрая доставка</h5>
+            <p class="text-muted">По всей России</p>
+        </div>
+        <div class="col-md-3 mb-3">
+            <i class="bi bi-shield-check fs-1"></i>
+            <h5 class="mt-2">Гарантия качества</h5>
+            <p class="text-muted">30 дней на возврат</p>
+        </div>
+    </div>
+    
+    <!-- Популярные товары (временно заглушка) -->
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h2>Популярные товары</h2>
+            <p class="text-muted">Скоро здесь появятся товары из каталога</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

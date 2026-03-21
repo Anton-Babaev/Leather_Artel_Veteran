@@ -1,0 +1,49 @@
+/* Основные стили для сайта */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 0;
+    margin: 0;
+}
+
+/* Кастомные стили для карточек товаров */
+.product-card {
+    transition: transform 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.product-card img {
+    height: 250px;
+    object-fit: cover;
+}
+
+.product-price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+    margin-left: 10px;
+}
+
+/* Стили для корзины */
+.cart-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .product-card img {
+        height: 200px;
+    }
+}
