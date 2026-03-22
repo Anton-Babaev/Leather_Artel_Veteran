@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Личный кабинет - Кожевенная артель «Ветеран»{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Личный кабинет</h1>
+    
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Меню</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#profile-info" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                        <i class="bi bi-person"></i> Личные данные
+                    </a>
+                    <a href="#orders" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-truck"></i> Мои заказы
+                    </a>
+                    <a href="#wishlist" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="bi bi-heart"></i> Избранное
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Личные данные -->
+                <div class="tab-pane fade show active" id="profile-info">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Личные данные</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="first_name" class="form-label">Имя</label>
+                                        <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="last_name" class="form-label">Фамилия</label>
+                                        <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" value="{{ user.email }}">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label">Телефон</label>
+                                    {{ form.phone }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.address.id_for_label }}" class="form-label">Адрес</label>
+                                    {{ form.address }}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        <label for="{{ form.city.id_for_label }}" class="form-label">Город</label>
+                                        {{ form.city }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.avatar.id_for_label }}" class="form-label">Аватар</label>
+                                        {{ form.avatar }}
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-dark">
+                                    <i class="bi bi-save"></i> Сохранить изменения
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Мои заказы -->
+                <div class="tab-pane fade" id="orders">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">История заказов</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if orders %}
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>№ заказа</th>
+                                                <th>Дата</th>
+                                                <th>Сумма</th>
+                                                <th>Статус</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for order in orders %}
+                                            <tr>
+                                                <td>#{{ order.id }}</td>
+                                                <td>{{ order.created_at|date:"d.m.Y" }}</td>
+                                                <td>{{ order.total_price }} ₽</td>
+                                                <td>
+                                                    <span class="badge {% if order.status == 'new' %}bg-info{% elif order.status == 'paid' %}bg-success{% elif order.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                        {{ order.get_status_display }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'users:order_detail' order.id %}" class="btn btn-sm btn-outline-dark">
+                                                        Подробнее
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted text-center">У вас пока нет заказов.</p>
+                                <div class="text-center">
+                                    <a href="{% url 'catalog:product_list' %}" class="btn btn-dark">
+                                        Перейти в каталог
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Избранное -->
+                <div class="tab-pane fade" id="wishlist">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Избранные товары</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="wishlist-items">
+                                {% include 'users/wishlist_items.html' with wishlist_items=wishlist_items %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Активация табов
+document.querySelectorAll('.list-group-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('show', 'active'));
+        document.querySelectorAll('.list-group-item').forEach(link => link.classList.remove('active'));
+        
+        const target = this.getAttribute('href');
+        document.querySelector(target).classList.add('show', 'active');
+        this.classList.add('active');
+    });
+});
+</script>
+{% endblock %}

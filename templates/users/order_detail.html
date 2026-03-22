@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Заказ №{{ order.id }} - Кожевенная артель «Ветеран»{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'users:profile' %}">Личный кабинет</a></li>
+            <li class="breadcrumb-item active">Заказ №{{ order.id }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Детали заказа</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Товар</th>
+                                    <th>Кол-во</th>
+                                    <th>Цена</th>
+                                    <th>Сумма</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.price }} ₽</td>
+                                    <td>{{ item.get_cost }} ₽</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Итого:</strong></td>
+                                    <td><strong>{{ order.total_price }} ₽</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Информация о заказе</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Статус:</strong> 
+                        <span class="badge {% if order.status == 'new' %}bg-info{% elif order.status == 'paid' %}bg-success{% elif order.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </p>
+                    <p><strong>Дата заказа:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Данные получателя</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Имя:</strong> {{ order.first_name }} {{ order.last_name }}</p>
+                    <p><strong>Телефон:</strong> {{ order.phone }}</p>
+                    <p><strong>Email:</strong> {{ order.email }}</p>
+                    <p><strong>Адрес:</strong> {{ order.address }}, {{ order.city }}</p>
+                    <p><strong>Доставка:</strong> {{ order.delivery_method }}</p>
+                    <p><strong>Оплата:</strong> {{ order.payment_method }}</p>
+                    {% if order.comment %}
+                        <p><strong>Комментарий:</strong> {{ order.comment }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="{% url 'users:profile' %}#orders" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Вернуться в профиль
+        </a>
+    </div>
+</div>
+{% endblock %}

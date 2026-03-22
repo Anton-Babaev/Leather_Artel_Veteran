@@ -18,9 +18,34 @@
                     <i class="bi bi-cart"></i> Корзина
                     <span id="cart-counter" class="badge bg-danger rounded-pill">{{ cart|length }}</span>
                 </a>
-                <a href="/profile/" class="text-white text-decoration-none">
-                    <i class="bi bi-person"></i> Войти
-                </a>
+                
+                {% if user.is_authenticated %}
+                    <div class="dropdown d-inline-block">
+                        <a href="#" class="text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-person"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'users:profile' %}">
+                                <i class="bi bi-person-circle"></i> Личный кабинет
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'users:wishlist' %}">
+                                <i class="bi bi-heart"></i> Избранное
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'users:logout' %}">
+                                <i class="bi bi-box-arrow-right"></i> Выйти
+                            </a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="text-white text-decoration-none">
+                        <i class="bi bi-person"></i> Войти
+                    </a>
+                    <span class="text-white-50 mx-1">|</span>
+                    <a href="{% url 'users:register' %}" class="text-white text-decoration-none">
+                        Регистрация
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>

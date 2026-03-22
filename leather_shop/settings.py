@@ -101,8 +101,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Настройки для email (для разработки используем консоль)
+# Email настройки (для разработки используем консоль)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@veteran.ru'
 
 # Настройки сессий (для корзины)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
